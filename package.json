@@ -1,0 +1,25 @@
+{
+  "name": "ratingupdater",
+  "version": "0.1.0",
+  "description": "new and improved version",
+  "private": true,
+  "author": "pietaa",
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@biomejs/biome": "^2.5.9",
+    "@libsql/client": "^0.17.4",
+    "@types/node": "^26.2.0",
+    "discord.js": "^14.27.0",
+    "dotenv": "^17.4.2"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.31.10",
+    "drizzle-orm": "^0.45.2",
+    "tsx": "^4.23.12",
+    "typescript": "^7.0.2"
+  }
+}
