@@ -1,24 +1,8 @@
-import { Events, type Interaction, MessageFlags } from "discord.js";
-import type { BotClient } from "../client.js";
+import { Events, type Client } from "discord.js";
 
-export const name = Events.InteractionCreate;
+export const name = Events.ClientReady;
+export const once = true;
 
-export async function execute(interaction: Interaction) {
-  if (!interaction.isChatInputCommand()) return;
-
-  const client = interaction.client as BotClient;
-  const command = client.commands.get(interaction.commandName);
-  if (!command) return;
-
-  try {
-    await command.execute(interaction);
-  } catch (err) {
-    console.error(err);
-    const reply = { content: "?", flags: MessageFlags.Ephemeral as const };
-    if (interaction.replied || interaction.deferred) {
-      await interaction.followUp(reply);
-    } else {
-      await interaction.reply(reply);
-    }
-  }
+export function execute(client: Client<true>) {
+  console.log(`logged in as ${client.user.tag}`);
 }
