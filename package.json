@@ -5,9 +5,14 @@
   "private": true,
   "author": "pietaa",
   "type": "module",
-  "main": "src/index.ts",
+  "main": "dist/index.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "register": "tsx src/register.ts",
+    "lint": "biome check .",
+    "format": "biome check . --write"
   },
   "dependencies": {
     "@biomejs/biome": "^2.5.9",
