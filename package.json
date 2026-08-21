@@ -12,7 +12,8 @@
     "start": "node dist/index.js",
     "register": "tsx src/register.ts",
     "lint": "biome check .",
-    "format": "biome check . --write"
+    "format": "biome check . --write",
+    "seed": "tsx src/db/seed.ts"
   },
   "dependencies": {
     "@biomejs/biome": "^2.5.9",
