@@ -19,11 +19,11 @@
     "@libsql/client": "^0.17.4",
     "@types/node": "^26.2.0",
     "discord.js": "^14.27.0",
-    "dotenv": "^17.4.2"
+    "dotenv": "^17.4.2",
+    "drizzle-orm": "^1.0.0-rc.4"
   },
   "devDependencies": {
-    "drizzle-kit": "^0.31.10",
-    "drizzle-orm": "^0.45.2",
+    "drizzle-kit": "^1.0.0-rc.4",
     "tsx": "^4.23.12",
     "typescript": "^7.0.2"
   }

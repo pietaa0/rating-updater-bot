@@ -19,6 +19,6 @@
     }
   },
   "files": {
-    "includes": ["src/**", "*.json"]
+    "includes": ["src/**", "*.json", "drizzle.config.ts"]
   }
 }
