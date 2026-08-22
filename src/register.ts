@@ -1,8 +1,7 @@
 import "dotenv/config";
-
-import { readdir } from "node:fs/promises";
 import path from "node:path";
 import { REST, Routes } from "discord.js";
+import { findCommandFiles } from "./commands/index.js";
 import type { Command } from "./types.js";
 
 const token = process.env.DISCORD_TOKEN;
@@ -14,16 +13,14 @@ if (!token || !clientID || !guildID) {
 }
 
 const commandsDir = path.join(import.meta.dirname, "./commands");
-
-const files = (await readdir(commandsDir)).filter((f) => f.endsWith(".ts") && f !== "index.ts");
+const files = await findCommandFiles(commandsDir, ".ts");
 
 const commands = [];
 for (const file of files) {
-  const { command }: { command: Command } = await import(`./commands/${file}`);
+  const { command }: { command: Command } = await import(file);
   commands.push(command.data.toJSON());
 }
 
 const rest = new REST().setToken(token);
 const data = await rest.put(Routes.applicationGuildCommands(clientID, guildID), { body: commands });
-
 console.log(`Loaded ${(data as unknown[]).length} commands succesfully!`);
