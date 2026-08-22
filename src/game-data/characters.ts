@@ -1,4 +1,4 @@
-export const CHARACTER_SEED = [
+export const striveCharacters = [
   { id: "SO", name: "Sol" },
   { id: "KY", name: "Ky" },
   { id: "MA", name: "May" },
