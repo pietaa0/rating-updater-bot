@@ -10,3 +10,14 @@ export const playerSchema = z.object({
   name: z.string(),
   ratings: z.array(ratingSchema),
 });
+export const searchSchema = z.object({
+  results: z.array(
+    z.object({
+      id: z.string(),
+      name: z.string(),
+      rating: z.number(),
+      char_short: z.string(),
+      char_long: z.string(),
+    }),
+  ),
+});
