@@ -1,6 +1,6 @@
+import { db } from "../db/index.js";
+import { characters } from "../db/schema.js";
 import { striveCharacters } from "../game-data/characters.js";
-import { db } from "./index.js";
-import { characters } from "./schema.js";
 
 await db.insert(characters).values(striveCharacters).onConflictDoNothing();
 

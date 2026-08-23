@@ -10,10 +10,10 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "register": "tsx src/register.ts",
+    "register": "tsx src/lib/register.ts",
     "lint": "biome check .",
     "format": "biome check . --write",
-    "seed": "tsx src/db/seed.ts"
+    "seed": "tsx src/lib/seed.ts"
   },
   "dependencies": {
     "@biomejs/biome": "^2.5.9",

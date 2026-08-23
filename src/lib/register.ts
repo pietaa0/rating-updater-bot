@@ -1,8 +1,8 @@
 import "dotenv/config";
 import path from "node:path";
 import { REST, Routes } from "discord.js";
-import { findCommandFiles } from "./commands/index.js";
-import type { Command } from "./types.js";
+import { findCommandFiles } from "../commands/index.js";
+import type { Command } from "../types.js";
 
 const token = process.env.DISCORD_TOKEN;
 const clientID = process.env.DISCORD_CLIENT_ID;
@@ -12,7 +12,7 @@ if (!token || !clientID || !guildID) {
   throw new Error("Missing DISCORD_TOKEN, DISCORD_CLIENT_ID, or DISCORD_GUILD_ID in .env");
 }
 
-const commandsDir = path.join(import.meta.dirname, "./commands");
+const commandsDir = path.join(import.meta.dirname, "../commands");
 const files = await findCommandFiles(commandsDir, ".ts");
 
 const commands = [];
