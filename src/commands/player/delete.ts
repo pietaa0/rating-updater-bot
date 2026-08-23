@@ -1,0 +1,111 @@
+import {
+  type MessageComponentInteraction,
+  MessageFlags,
+  SlashCommandBuilder,
+  TextDisplayBuilder,
+} from "discord.js";
+import { removePlayerContainer } from "../../components/components.js";
+import {
+  getAllLeaderboards,
+  getLeaderboardData,
+  leaderboardExists,
+  removeLeaderboardEntry,
+} from "../../db/queries.js";
+import type { Command } from "../../types.js";
+export const command: Command = {
+  data: new SlashCommandBuilder()
+    .setName("removeplayer")
+    .setDescription("remove players from the leaderboard")
+    .addStringOption((opt) =>
+      opt
+        .setName("leaderboard")
+        .setDescription("which leaderboard")
+        .setRequired(true)
+        .setAutocomplete(true),
+    ),
+  autocomplete: async (interaction) => {
+    const focused = interaction.options.getFocused(true);
+    const query = focused.value.toLowerCase();
+
+    try {
+      if (focused.name === "leaderboard") {
+        const leaderboards = await getAllLeaderboards(interaction.guildId!);
+        const matches = leaderboards.filter((l) => l.name.toLowerCase().includes(query));
+        await interaction.respond(matches.map((l) => ({ name: l.name, value: l.name })));
+        return;
+      }
+    } catch (err) {
+      console.error("removeplayer autocomplete failed:", err);
+      await interaction.respond([]);
+    }
+  },
+
+  execute: async (interaction) => {
+    const guildId = interaction.guildId!;
+    const leaderboardName = interaction.options.getString("leaderboard", true);
+
+    const validLeaderboard = await leaderboardExists(guildId, leaderboardName);
+    if (!validLeaderboard) {
+      await interaction.reply({
+        content: "please pick a valid leaderboard",
+        flags: MessageFlags.Ephemeral,
+      });
+      return;
+    }
+
+    const leaderboard = await getLeaderboardData(guildId, leaderboardName);
+
+    if (leaderboard.length === 0) {
+      await interaction.reply(`there are no players on ${leaderboardName}`);
+      return;
+    }
+
+    const response = await interaction.deferReply({ withResponse: true });
+
+    const container = removePlayerContainer(leaderboard);
+
+    await interaction.editReply({ components: [container], flags: MessageFlags.IsComponentsV2 });
+
+    const collectorFilter = (i: MessageComponentInteraction) => {
+      if (i.user.id !== interaction.user.id) {
+        i.reply({ content: "this isn't your menu", flags: MessageFlags.Ephemeral });
+        return false;
+      }
+      return true;
+    };
+
+    try {
+      const confirmation = await response.resource?.message?.awaitMessageComponent({
+        filter: collectorFilter,
+        time: 60_000,
+      });
+
+      if (!confirmation?.isButton()) {
+        console.error("removeplayer's confirmation wasn't button");
+        return;
+      }
+
+      await confirmation.deferUpdate();
+
+      const [playerId, characterId] = confirmation.customId.split(":");
+
+      if (!playerId || !characterId) {
+        console.error(`removeplayer had playerId ${playerId} and characterId ${characterId}`);
+        return;
+      }
+
+      await removeLeaderboardEntry(guildId, leaderboardName, playerId, characterId);
+
+      confirmation.editReply({
+        components: [
+          new TextDisplayBuilder().setContent(`successfully removed player from leaderboard`),
+        ],
+      });
+    } catch (_) {
+      await interaction.editReply({
+        components: [new TextDisplayBuilder().setContent("timed out")],
+      });
+      return;
+    }
+  },
+};
