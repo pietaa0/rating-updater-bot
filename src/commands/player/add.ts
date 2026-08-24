@@ -16,6 +16,7 @@ import {
 import { striveCharacters } from "../../game-data/characters.js";
 import { getPlayerById, getPlayerByName } from "../../puddlefarm/client.js";
 import type { Command } from "../../types.js";
+import { extract } from "fuzzball";
 
 export const command: Command = {
   data: new SlashCommandBuilder()
@@ -48,17 +49,34 @@ export const command: Command = {
 
     try {
       if (focused.name === "character") {
-        const matches = striveCharacters.filter((c) => c.name.toLowerCase().includes(query));
-        await interaction.respond(
-          matches.slice(0, 25).map((c) => ({ name: c.name, value: c.name })),
-        );
+        if (query === "") {
+          await interaction.respond(striveCharacters.map((c) => ({ name: c.name, value: c.name })));
+          return;
+        }
+        const fuzzed = extract(
+          query,
+          striveCharacters.map((c) => c.name),
+        )
+          .sort((a, b) => b[1] - a[1])
+          .map((c) => c[0]);
+        await interaction.respond(fuzzed.slice(0, 25).map((c) => ({ name: c, value: c })));
         return;
       }
 
       if (focused.name === "leaderboard") {
         const leaderboards = await getAllLeaderboards(interaction.guildId!);
-        const matches = leaderboards.filter((l) => l.name.toLowerCase().includes(query));
-        await interaction.respond(matches.map((l) => ({ name: l.name, value: l.name })));
+
+        if (query === "") {
+          await interaction.respond(leaderboards.map((l) => ({ name: l.name, value: l.name })));
+          return;
+        }
+        const fuzzed = extract(
+          query,
+          leaderboards.map((r) => r.name),
+        )
+          .sort((a, b) => b[1] - a[1])
+          .map((n) => n[0]);
+        await interaction.respond(fuzzed.map((l) => ({ name: l, value: l })));
         return;
       }
     } catch (err) {

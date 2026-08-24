@@ -1,6 +1,7 @@
 import { MessageFlags, SlashCommandBuilder } from "discord.js";
 import { deleteLeaderboard, getAllLeaderboards, leaderboardExists } from "../../db/queries.js";
 import type { Command } from "../../types.js";
+import { extract } from "fuzzball";
 
 export const command: Command = {
   data: new SlashCommandBuilder()
@@ -20,8 +21,18 @@ export const command: Command = {
     if (focused.name === "name") {
       try {
         const leaderboards = await getAllLeaderboards(interaction.guildId!);
-        const matches = leaderboards.filter((l) => l.name.toLowerCase().includes(query));
-        await interaction.respond(matches.map((l) => ({ name: l.name, value: l.name })));
+
+        if (query === "") {
+          await interaction.respond(leaderboards.map((l) => ({ name: l.name, value: l.name })));
+          return;
+        }
+        const fuzzed = extract(
+          query,
+          leaderboards.map((l) => l.name),
+        )
+          .sort((a, b) => b[1] - a[1])
+          .map((n) => n[0]);
+        await interaction.respond(fuzzed.map((n) => ({ name: n, value: n })));
         return;
       } catch (err) {
         console.error("show leaderboard autocomplete failed:", err);
