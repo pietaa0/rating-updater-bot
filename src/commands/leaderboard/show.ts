@@ -1,6 +1,12 @@
-import { MessageFlags, SlashCommandBuilder } from "discord.js";
+import { MessageFlags, SlashCommandBuilder, TextDisplayBuilder } from "discord.js";
 import { leaderboardContainer } from "../../components/components.js";
-import { getAllLeaderboards, getLeaderboardData, leaderboardExists } from "../../db/queries.js";
+import {
+  getAllLeaderboards,
+  getLeaderboardData,
+  getStalePlayers,
+  leaderboardExists,
+} from "../../db/queries.js";
+import { SYNC_STALENESS_MS, syncLeaderboardRatings } from "../../lib/sync.js";
 import type { Command } from "../../types.js";
 
 export const command: Command = {
@@ -37,19 +43,36 @@ export const command: Command = {
     const leaderboardname = interaction.options.getString("name", true);
 
     if (!(await leaderboardExists(guildId, leaderboardname))) {
-      interaction.reply(`${leaderboardname} doesn't exist`);
+      await interaction.reply(`${leaderboardname} doesn't exist`);
       return;
+    }
+
+    const stalePlayers = await getStalePlayers(guildId, leaderboardname, SYNC_STALENESS_MS);
+
+    if (stalePlayers.length > 0) {
+      await interaction.reply({
+        components: [new TextDisplayBuilder().setContent("syncing database...")],
+        flags: MessageFlags.IsComponentsV2,
+      });
+
+      const results = await syncLeaderboardRatings(guildId, leaderboardname, stalePlayers);
+      const failed = results.filter((r) => !r.success);
+      if (failed.length > 0) {
+        console.warn(`${failed.length}/${results.length} syncs failed`, failed);
+      }
+    } else {
+      await interaction.deferReply();
     }
 
     const rows = await getLeaderboardData(guildId, leaderboardname);
 
     if (rows.length === 0) {
-      interaction.reply(`${leaderboardname} is empty`);
+      await interaction.editReply(`${leaderboardname} is empty`);
       return;
     }
 
     const leaderboard = leaderboardContainer(rows);
 
-    interaction.reply({ components: [leaderboard], flags: MessageFlags.IsComponentsV2 });
+    await interaction.editReply({ components: [leaderboard], flags: MessageFlags.IsComponentsV2 });
   },
 };
