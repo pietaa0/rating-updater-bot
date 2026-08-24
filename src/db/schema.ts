@@ -46,6 +46,6 @@ export const ratings = sqliteTable(
     foreignKey({
       columns: [t.guildId, t.leaderboardName],
       foreignColumns: [leaderboards.guildId, leaderboards.name],
-    }),
+    }).onDelete("cascade"),
   ],
 );
