@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, desc, eq, lt } from "drizzle-orm";
 import { db } from "./index.js";
 import { leaderboards, ratings, strivePlayers } from "./schema.js";
 
@@ -77,8 +77,11 @@ export async function getLeaderboardData(guildId: string, leaderboardName: strin
     })
     .from(ratings)
     .innerJoin(strivePlayers, eq(ratings.playerId, strivePlayers.id))
-    .where(and(eq(ratings.guildId, guildId), eq(ratings.leaderboardName, leaderboardName)));
+    .where(and(eq(ratings.guildId, guildId), eq(ratings.leaderboardName, leaderboardName)))
+    .orderBy(desc(ratings.rating));
 }
+
+export type LeaderboardRow = Awaited<ReturnType<typeof getLeaderboardData>>[number];
 
 export async function removeLeaderboardEntry(
   guildId: string,
@@ -102,4 +105,61 @@ export async function removeLeaderboardEntry(
     .returning();
 }
 
-export type LeaderboardRow = Awaited<ReturnType<typeof getLeaderboardData>>[number];
+export async function updatePlayerRating(
+  guildId: string,
+  leaderboardName: string,
+  playerId: string,
+  characterId: string,
+  rating: number,
+) {
+  await db
+    .update(ratings)
+    .set({ rating })
+    .where(
+      and(
+        eq(ratings.guildId, guildId),
+        eq(ratings.leaderboardName, leaderboardName),
+        eq(ratings.playerId, playerId),
+        eq(ratings.characterId, characterId),
+      ),
+    );
+}
+
+export async function getTrackedCharacters(
+  guildId: string,
+  leaderboardName: string,
+  playerId: string,
+) {
+  const rows = await db
+    .select({ characterId: ratings.characterId })
+    .from(ratings)
+    .where(
+      and(
+        eq(ratings.guildId, guildId),
+        eq(ratings.leaderboardName, leaderboardName),
+        eq(ratings.playerId, playerId),
+      ),
+    );
+  return rows.map((r) => r.characterId);
+}
+
+export async function getStalePlayers(
+  guildId: string,
+  leaderboardName: string,
+  thresholdMs: number,
+) {
+  const threshold = new Date(Date.now() - thresholdMs);
+
+  const rows = await db
+    .selectDistinct({ playerId: ratings.playerId })
+    .from(ratings)
+    .where(
+      and(
+        eq(ratings.guildId, guildId),
+        eq(ratings.leaderboardName, leaderboardName),
+        lt(ratings.updatedAt, threshold),
+      ),
+    );
+
+  return rows.map((r) => r.playerId);
+}
