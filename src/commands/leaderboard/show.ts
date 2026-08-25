@@ -1,14 +1,14 @@
 import { MessageFlags, SlashCommandBuilder, TextDisplayBuilder } from "discord.js";
-import { leaderboardContainer } from "../../components/components.js";
+import { extract } from "fuzzball";
 import {
   getAllLeaderboards,
   getLeaderboardData,
   getStalePlayers,
   leaderboardExists,
 } from "../../db/queries.js";
+import { leaderboardContainer } from "../../discord/components.js";
 import { SYNC_STALENESS_MS, syncLeaderboardRatings } from "../../lib/sync.js";
 import type { Command } from "../../types.js";
-import { extract } from "fuzzball";
 
 export const command: Command = {
   data: new SlashCommandBuilder()

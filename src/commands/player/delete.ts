@@ -4,15 +4,15 @@ import {
   SlashCommandBuilder,
   TextDisplayBuilder,
 } from "discord.js";
-import { removePlayerContainer } from "../../components/components.js";
+import { extract } from "fuzzball";
 import {
   getAllLeaderboards,
   getLeaderboardData,
   leaderboardExists,
   removeLeaderboardEntry,
 } from "../../db/queries.js";
+import { removePlayerContainer } from "../../discord/components.js";
 import type { Command } from "../../types.js";
-import { extract } from "fuzzball";
 export const command: Command = {
   data: new SlashCommandBuilder()
     .setName("removeplayer")

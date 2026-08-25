@@ -4,7 +4,7 @@ import {
   SlashCommandBuilder,
   TextDisplayBuilder,
 } from "discord.js";
-import { addPlayerContainer } from "../../components/components.js";
+import { extract } from "fuzzball";
 import {
   addPlayerRating,
   getAllLeaderboards,
@@ -13,10 +13,14 @@ import {
   leaderboardExists,
   upsertPlayer,
 } from "../../db/queries.js";
+import { addPlayerContainer } from "../../discord/components.js";
 import { striveCharacters } from "../../game-data/characters.js";
-import { getPlayerById, getPlayerByName } from "../../puddlefarm/client.js";
+import {
+  getPlayerById,
+  getPlayerByName,
+  type puddleSearchResult,
+} from "../../puddlefarm/client.js";
 import type { Command } from "../../types.js";
-import { extract } from "fuzzball";
 
 export const command: Command = {
   data: new SlashCommandBuilder()
@@ -50,7 +54,9 @@ export const command: Command = {
     try {
       if (focused.name === "character") {
         if (query === "") {
-          await interaction.respond(striveCharacters.map((c) => ({ name: c.name, value: c.name })));
+          await interaction.respond(
+            striveCharacters.slice(0, 25).map((c) => ({ name: c.name, value: c.name })),
+          );
           return;
         }
         const fuzzed = extract(
@@ -92,7 +98,7 @@ export const command: Command = {
 
     const validLeaderboard = await leaderboardExists(guildId, leaderboardName);
     if (!validLeaderboard) {
-      interaction.reply({
+      await interaction.reply({
         content: "please pick a valid leaderboard",
         flags: MessageFlags.Ephemeral,
       });
@@ -102,7 +108,7 @@ export const command: Command = {
     const leaderboard = await getLeaderboardData(guildId, leaderboardName);
 
     if (leaderboard.length > 24) {
-      interaction.reply({
+      await interaction.reply({
         content: "leaderboard has 25 players, please remove some before adding more",
         flags: MessageFlags.Ephemeral,
       });
@@ -111,7 +117,7 @@ export const command: Command = {
 
     const validCharacter = striveCharacters.some((c) => c.name === character);
     if (!validCharacter) {
-      interaction.reply({
+      await interaction.reply({
         content: "please pick a valid character",
         flags: MessageFlags.Ephemeral,
       });
@@ -119,7 +125,7 @@ export const command: Command = {
     }
 
     const response = await interaction.deferReply({ withResponse: true });
-    let data = [];
+    let data: puddleSearchResult = [];
 
     try {
       const direct = await getPlayerById(query);
@@ -128,7 +134,7 @@ export const command: Command = {
         const rating = direct.ratings.find((r) => r.character === character);
 
         if (!rating) {
-          interaction.editReply(`${direct.name} doesn't have any ratings for ${character}`);
+          await interaction.editReply(`${direct.name} doesn't have any ratings for ${character}`);
           return;
         }
         await upsertPlayer(direct.id, direct.name);
@@ -139,27 +145,30 @@ export const command: Command = {
           rating.char_short,
           rating.rating,
         );
-        interaction.editReply(`added ${direct.name} to ${leaderboardName}`);
+        await interaction.editReply(`added ${direct.name} to ${leaderboardName}`);
         return;
       }
       const search = await getPlayerByName(query);
 
       if (!search) {
-        interaction.editReply(`couldn't find any player "${query}"`);
+        await interaction.editReply(`couldn't find any player "${query}"`);
         return;
       }
 
       data = search.filter((r) => r.char_long === character);
       if (data.length > 0) {
         const container = addPlayerContainer(data);
-        interaction.editReply({ components: [container], flags: MessageFlags.IsComponentsV2 });
+        await interaction.editReply({
+          components: [container],
+          flags: MessageFlags.IsComponentsV2,
+        });
       } else {
-        interaction.editReply(`couldn't find any player "${query}"`);
+        await interaction.editReply(`couldn't find any player "${query}"`);
         return;
       }
     } catch (err) {
       console.error("failed to resolve player rating", err);
-      interaction.editReply("failed to reach puddle.farm, please try again later");
+      await interaction.editReply("failed to reach puddle.farm, please try again later");
       return;
     }
 

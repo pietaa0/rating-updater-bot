@@ -1,7 +1,7 @@
 import { MessageFlags, SlashCommandBuilder } from "discord.js";
+import { extract } from "fuzzball";
 import { deleteLeaderboard, getAllLeaderboards, leaderboardExists } from "../../db/queries.js";
 import type { Command } from "../../types.js";
-import { extract } from "fuzzball";
 
 export const command: Command = {
   data: new SlashCommandBuilder()
@@ -45,7 +45,10 @@ export const command: Command = {
     const guildId = interaction.guildId!;
 
     if (!(await leaderboardExists(guildId, name))) {
-      interaction.reply({ content: `"${name}" doesn't exist`, flags: MessageFlags.Ephemeral });
+      await interaction.reply({
+        content: `"${name}" doesn't exist`,
+        flags: MessageFlags.Ephemeral,
+      });
       return;
     }
     await deleteLeaderboard(guildId, name);

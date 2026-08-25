@@ -14,12 +14,15 @@ export const command: Command = {
     const guildId = interaction.guildId!;
 
     if (await leaderboardExists(guildId, name)) {
-      interaction.reply({ content: `"${name}" already exists`, flags: MessageFlags.Ephemeral });
+      await interaction.reply({
+        content: `"${name}" already exists`,
+        flags: MessageFlags.Ephemeral,
+      });
       return;
     }
     const leaderboards = await getAllLeaderboards(guildId);
     if (leaderboards.length > 9) {
-      interaction.reply({
+      await interaction.reply({
         content: "10 other leaderboards already exist, please delete one before creating another",
       });
       return;

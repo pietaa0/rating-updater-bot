@@ -11,7 +11,7 @@ export const command: Command = {
     const leaderboards = await getAllLeaderboards(guildId);
 
     if (leaderboards.length === 0) {
-      interaction.reply({
+      await interaction.reply({
         content: "this server has no leaderboards, create one using /addleaderboard",
         flags: MessageFlags.Ephemeral,
       });
@@ -21,6 +21,6 @@ export const command: Command = {
     for (const row of leaderboards) {
       content += `${row.name}\n`;
     }
-    interaction.reply(content);
+    await interaction.reply(content);
   },
 };
