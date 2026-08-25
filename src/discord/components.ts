@@ -2,6 +2,7 @@ import { ButtonStyle, ContainerBuilder, SeparatorSpacingSize } from "discord.js"
 import type { LeaderboardRow } from "../db/queries.js";
 import { striveCharacters } from "../game-data/characters.js";
 import type { puddleSearchResult } from "../puddlefarm/client.js";
+import { emoji } from "./emoji.js";
 
 export function leaderboardContainer(leaderboard: LeaderboardRow[]) {
   const display = leaderboard.map((r) => ({
@@ -27,10 +28,9 @@ export function leaderboardContainer(leaderboard: LeaderboardRow[]) {
   return container;
 }
 
-export function addPlayerContainer(players: puddleSearchResult) {
-  if (players.length > 5) {
-    players.length = 5;
-  }
+export function addPlayerContainer(search: puddleSearchResult) {
+  const players = search.slice(0, 5);
+
   const container = new ContainerBuilder()
     .setAccentColor(0xff0000)
     .addTextDisplayComponents((textdisplay) => textdisplay.setContent("### add a player"));
@@ -89,5 +89,7 @@ function numToRating(rating: number) {
 }
 
 function playerRow(name: string, character: string, rating: number) {
-  return `**${name}**: **${numToRating(rating)}** on **${character}**`;
+  const characterId = striveCharacters.find((c) => c.name === character)?.id;
+  const characterEmoji = characterId ? emoji(characterId) : "";
+  return `**${name}**: **${numToRating(rating)}** on ${characterEmoji}**${character}**`;
 }
