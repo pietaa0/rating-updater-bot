@@ -107,7 +107,7 @@ export const command: Command = {
 
     const leaderboard = await getLeaderboardData(guildId, leaderboardName);
 
-    if (leaderboard.length > 24) {
+    if (leaderboard.length > 25) {
       await interaction.reply({
         content: "leaderboard has 25 players, please remove some before adding more",
         flags: MessageFlags.Ephemeral,
