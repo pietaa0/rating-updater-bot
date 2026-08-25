@@ -1,5 +1,6 @@
-node_modules
-dist
-data
-drizzle
+node_modules/
+dist/
+/data/
 .env
+/assets/emoji/
+src/game-data/generated-emoji.ts
