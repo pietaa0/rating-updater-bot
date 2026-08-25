@@ -4,7 +4,7 @@ A Discord bot (discord.js v14) that tracks Guilty Gear Strive player ratings and
 displays per-server, per-character leaderboards. Ratings are pulled from the
 [puddle.farm](https://puddle.farm) API.
 
-[Get the bot here!](https://discord.com/oauth2/authorize?client_id=1521605708028575861) _(requires basic slash command and message permissions)_
+[Get the bot here!](https://discord.com/oauth2/authorize?client_id=1541922416190685214) _(requires basic slash command and message permissions)_
 
 ## Features
 
