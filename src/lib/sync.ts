@@ -22,7 +22,6 @@ export async function syncPlayerRatings(
 
   for (const rating of player.ratings) {
     if (!trackedCharacters.includes(rating.char_short)) continue;
-    if (rating.rating == null) continue; // TODO: null rating handling
     await updatePlayerRating(guildId, leaderboardName, player.id, rating.char_short, rating.rating);
   }
 }
