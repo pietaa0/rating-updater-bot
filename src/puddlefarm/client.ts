@@ -14,7 +14,8 @@ export async function getPlayerById(id: string) {
 }
 
 export async function getPlayerByName(name: string) {
-  const res = await fetch(`${baseUrl}/player/search?search_string=${name}`);
+  const encodedName = encodeURIComponent(name);
+  const res = await fetch(`${baseUrl}/player/search?search_string=${encodedName}`);
 
   if (res.status === 404) return null;
   if (!res.ok) throw new Error(`puddle.farm returned ${res.status} for player ${name}`);
