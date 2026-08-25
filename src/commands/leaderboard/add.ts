@@ -13,6 +13,14 @@ export const command: Command = {
     const name = interaction.options.getString("name", true);
     const guildId = interaction.guildId!;
 
+    if (name.length > 100) {
+      await interaction.reply({
+        content: `please choose a name under 100 characters long`,
+        flags: MessageFlags.Ephemeral,
+      });
+      return;
+    }
+
     if (await leaderboardExists(guildId, name)) {
       await interaction.reply({
         content: `"${name}" already exists`,
