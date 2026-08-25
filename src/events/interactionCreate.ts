@@ -15,6 +15,9 @@ export async function execute(interaction: Interaction) {
   if (interaction.isChatInputCommand()) {
     const command = client.commands.get(interaction.commandName);
     if (!command) return;
+    if (!interaction.inGuild()) {
+      await interaction.reply("i only work in servers");
+    }
 
     try {
       await command.execute(interaction);
