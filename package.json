@@ -12,7 +12,8 @@
     "register": "tsx src/lib/register.ts",
     "lint": "biome check .",
     "format": "biome check . --write",
-    "seed": "tsx src/lib/seed.ts",
+    "db:migrate": "drizzle-kit migrate",
+    "db:seed": "tsx src/lib/seed.ts",
     "upload-emoji": "tsx src/lib/upload-emoji.ts"
   },
   "dependencies": {
