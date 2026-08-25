@@ -17,6 +17,7 @@ export async function execute(interaction: Interaction) {
     if (!command) return;
     if (!interaction.inGuild()) {
       await interaction.reply("i only work in servers");
+      return
     }
 
     try {
