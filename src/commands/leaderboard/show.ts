@@ -82,7 +82,7 @@ export const command: Command = {
       return;
     }
 
-    const leaderboard = leaderboardContainer(rows);
+    const leaderboard = await leaderboardContainer(rows);
 
     await interaction.editReply({ components: [leaderboard], flags: MessageFlags.IsComponentsV2 });
   },

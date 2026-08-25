@@ -4,7 +4,7 @@ import { striveCharacters } from "../game-data/characters.js";
 import type { puddleSearchResult } from "../puddlefarm/client.js";
 import { emoji } from "./emoji.js";
 
-export function leaderboardContainer(leaderboard: LeaderboardRow[]) {
+export async function leaderboardContainer(leaderboard: LeaderboardRow[]) {
   const display = leaderboard.map((r) => ({
     ...r,
     characterName: striveCharacters.find((c) => c.id === r.characterId)?.name ?? r.characterId,
@@ -18,17 +18,16 @@ export function leaderboardContainer(leaderboard: LeaderboardRow[]) {
     .addSeparatorComponents((separator) => separator.setSpacing(SeparatorSpacingSize.Small));
 
   for (const [i, row] of display.entries()) {
+    const player = await playerRow(row.playerName, row.characterName, row.rating);
     container.addTextDisplayComponents((textdisplay) =>
-      textdisplay.setContent(
-        `${i + 1}. ${playerRow(row.playerName, row.characterName, row.rating)}`,
-      ),
+      textdisplay.setContent(`${i + 1}. ${player}`),
     );
   }
 
   return container;
 }
 
-export function addPlayerContainer(search: puddleSearchResult) {
+export async function addPlayerContainer(search: puddleSearchResult) {
   const players = search.slice(0, 5);
 
   const container = new ContainerBuilder()
@@ -36,11 +35,10 @@ export function addPlayerContainer(search: puddleSearchResult) {
     .addTextDisplayComponents((textdisplay) => textdisplay.setContent("### add a player"));
 
   for (const [i, row] of players.entries()) {
+    const player = await playerRow(row.name, row.char_long, row.rating);
     container.addSectionComponents((section) =>
       section
-        .addTextDisplayComponents((textdisplay) =>
-          textdisplay.setContent(`${i + 1}. ${playerRow(row.name, row.char_long, row.rating)}`),
-        )
+        .addTextDisplayComponents((textdisplay) => textdisplay.setContent(`${i + 1}. ${player}`))
         .setButtonAccessory((button) =>
           button.setCustomId(`${row.id}`).setLabel("add").setStyle(ButtonStyle.Primary),
         ),
@@ -49,7 +47,7 @@ export function addPlayerContainer(search: puddleSearchResult) {
   return container;
 }
 
-export function removePlayerContainer(leaderboard: LeaderboardRow[]) {
+export async function removePlayerContainer(leaderboard: LeaderboardRow[]) {
   const display = leaderboard.map((r) => ({
     ...r,
     characterName: striveCharacters.find((c) => c.id === r.characterId)?.name ?? r.characterId,
@@ -61,13 +59,10 @@ export function removePlayerContainer(leaderboard: LeaderboardRow[]) {
     .addSeparatorComponents((separator) => separator.setSpacing(SeparatorSpacingSize.Small));
 
   for (const [i, row] of display.entries()) {
+    const player = await playerRow(row.playerName, row.characterName, row.rating);
     container.addSectionComponents((section) =>
       section
-        .addTextDisplayComponents((textdisplay) =>
-          textdisplay.setContent(
-            `${i + 1}. ${playerRow(row.playerName, row.characterName, row.rating)}`,
-          ),
-        )
+        .addTextDisplayComponents((textdisplay) => textdisplay.setContent(`${i + 1}. ${player}`))
         .setButtonAccessory((button) =>
           button
             .setCustomId(`${row.playerId}:${row.characterId}`)
@@ -88,8 +83,8 @@ function numToRating(rating: number) {
   }
 }
 
-function playerRow(name: string, character: string, rating: number) {
+async function playerRow(name: string, character: string, rating: number) {
   const characterId = striveCharacters.find((c) => c.name === character)?.id;
-  const characterEmoji = characterId ? emoji(characterId) : "";
+  const characterEmoji = characterId ? await emoji(characterId) : "";
   return `**${name}**: **${numToRating(rating)}** on ${characterEmoji}**${character}**`;
 }
