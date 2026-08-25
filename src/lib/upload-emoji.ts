@@ -14,17 +14,17 @@ const mapping: Record<string, { id: string; name: string }> = {};
 for (const char of striveCharacters) {
   const filePath = path.join(assetDir, `${char.id}.png`);
 
-  try {
-    await readFile(filePath);
-  } catch {
-    console.warn(`no image found for ${char.name}, skipping`);
-    continue;
-  }
-
   const already = existing.find((e) => e.name === char.id);
   if (already) {
     mapping[char.id] = { id: already.id, name: already.name };
     console.log(`emoji for ${char.name} already existed`);
+    continue;
+  }
+
+  try {
+    await readFile(filePath);
+  } catch {
+    console.warn(`no image found for ${char.name}, skipping`);
     continue;
   }
 
