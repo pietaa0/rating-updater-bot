@@ -1,4 +1,6 @@
 import {
+  DiscordjsError,
+  DiscordjsErrorCodes,
   type MessageComponentInteraction,
   MessageFlags,
   SlashCommandBuilder,
@@ -100,11 +102,20 @@ export const command: Command = {
           new TextDisplayBuilder().setContent(`successfully removed player from leaderboard`),
         ],
       });
-    } catch (_) {
+    } catch (err) {
+      if (
+        err instanceof DiscordjsError &&
+        err.code === DiscordjsErrorCodes.InteractionCollectorError
+      ) {
+        await interaction.editReply({
+          components: [new TextDisplayBuilder().setContent("timed out")],
+        });
+        return;
+      }
+      console.error("removePlayer componentCollector failed:", err);
       await interaction.editReply({
-        components: [new TextDisplayBuilder().setContent("timed out")],
+        components: [new TextDisplayBuilder().setContent("something went wrong")],
       });
-      return;
     }
   },
 };

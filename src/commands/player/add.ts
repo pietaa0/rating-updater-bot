@@ -1,4 +1,6 @@
 import {
+  DiscordjsError,
+  DiscordjsErrorCodes,
   type MessageComponentInteraction,
   MessageFlags,
   SlashCommandBuilder,
@@ -84,8 +86,7 @@ export const command: Command = {
     }
 
     const leaderboard = await getLeaderboardData(guildId, leaderboardName);
-
-    if (leaderboard.length > 25) {
+    if (leaderboard.length > 24) {
       await interaction.reply({
         content: "leaderboard has 25 players, please remove some before adding more",
         flags: MessageFlags.Ephemeral,
@@ -128,7 +129,7 @@ export const command: Command = {
       }
       const search = await getPlayerByName(query);
 
-      if (!search) {
+      if (!search || search.length === 0) {
         await interaction.editReply(`couldn't find any player "${query}"`);
         return;
       }
@@ -141,7 +142,7 @@ export const command: Command = {
           flags: MessageFlags.IsComponentsV2,
         });
       } else {
-        await interaction.editReply(`couldn't find any player "${query}"`);
+        await interaction.editReply(`couldn't find any player "${query}" who plays ${character}`);
         return;
       }
     } catch (err) {
@@ -161,7 +162,7 @@ export const command: Command = {
     try {
       const confirmation = await response.resource?.message?.awaitMessageComponent({
         filter: collectorFilter,
-        time: 60_000,
+        time: 300_000,
       });
 
       if (!confirmation?.isButton()) {
@@ -200,9 +201,19 @@ export const command: Command = {
       });
 
       return;
-    } catch (_) {
-      await interaction.editReply({
-        components: [new TextDisplayBuilder().setContent("timed out")],
+    } catch (err) {
+      if (
+        err instanceof DiscordjsError &&
+        err.code === DiscordjsErrorCodes.InteractionCollectorError
+      ) {
+        await interaction.editReply({
+          components: [new TextDisplayBuilder().setContent("timed out")],
+        });
+        return;
+      }
+      console.error("error:", err);
+      interaction.editReply({
+        components: [new TextDisplayBuilder().setContent(`something went wrong`)],
       });
       return;
     }
