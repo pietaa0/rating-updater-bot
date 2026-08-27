@@ -4,7 +4,6 @@ import {
   SlashCommandBuilder,
   TextDisplayBuilder,
 } from "discord.js";
-import { extract } from "fuzzball";
 import {
   getAllLeaderboards,
   getLeaderboardData,
@@ -13,6 +12,7 @@ import {
 } from "../../db/queries.js";
 import { removePlayerContainer } from "../../discord/components.js";
 import type { Command } from "../../types.js";
+import { getFuzzyAutocomplete } from "../shared.logic.js";
 export const command: Command = {
   data: new SlashCommandBuilder()
     .setName("removeplayer")
@@ -29,18 +29,8 @@ export const command: Command = {
     const query = focused.value.toLowerCase();
     try {
       if (focused.name === "leaderboard") {
-        const leaderboards = await getAllLeaderboards(interaction.guildId!);
-        if (query === "") {
-          await interaction.respond(leaderboards.map((l) => ({ name: l.name, value: l.name })));
-          return;
-        }
-        const fuzzed = extract(
-          query,
-          leaderboards.map((l) => l.name),
-        )
-          .sort((a, b) => b[1] - a[1])
-          .map((n) => n[0]);
-        await interaction.respond(fuzzed.map((n) => ({ name: n, value: n })));
+        const leaderboards = await getAllLeaderboards(interaction.guildId);
+        await interaction.respond(getFuzzyAutocomplete(query, leaderboards));
         return;
       }
     } catch (err) {

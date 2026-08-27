@@ -4,7 +4,6 @@ import {
   SlashCommandBuilder,
   TextDisplayBuilder,
 } from "discord.js";
-import { extract } from "fuzzball";
 import {
   addPlayerRating,
   getAllLeaderboards,
@@ -21,6 +20,7 @@ import {
   type puddleSearchResult,
 } from "../../puddlefarm/client.js";
 import type { Command } from "../../types.js";
+import { getFuzzyAutocomplete } from "../shared.logic.js";
 
 export const command: Command = {
   data: new SlashCommandBuilder()
@@ -53,36 +53,14 @@ export const command: Command = {
 
     try {
       if (focused.name === "character") {
-        if (query === "") {
-          await interaction.respond(
-            striveCharacters.slice(0, 25).map((c) => ({ name: c.name, value: c.name })),
-          );
-          return;
-        }
-        const fuzzed = extract(
-          query,
-          striveCharacters.map((c) => c.name),
-        )
-          .sort((a, b) => b[1] - a[1])
-          .map((c) => c[0]);
-        await interaction.respond(fuzzed.slice(0, 25).map((c) => ({ name: c, value: c })));
+        await interaction.respond(getFuzzyAutocomplete(query, striveCharacters));
         return;
       }
 
       if (focused.name === "leaderboard") {
-        const leaderboards = await getAllLeaderboards(interaction.guildId!);
+        const leaderboards = await getAllLeaderboards(interaction.guildId);
 
-        if (query === "") {
-          await interaction.respond(leaderboards.map((l) => ({ name: l.name, value: l.name })));
-          return;
-        }
-        const fuzzed = extract(
-          query,
-          leaderboards.map((r) => r.name),
-        )
-          .sort((a, b) => b[1] - a[1])
-          .map((n) => n[0]);
-        await interaction.respond(fuzzed.map((l) => ({ name: l, value: l })));
+        await interaction.respond(getFuzzyAutocomplete(query, leaderboards));
         return;
       }
     } catch (err) {

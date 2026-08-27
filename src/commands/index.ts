@@ -6,8 +6,13 @@ export async function findCommandFiles(commandsDir: string, extension: string): 
   const files: string[] = [];
 
   for (const entry of entries) {
-    if (entry.name === `index${extension}`) continue;
-
+    if (
+      entry.name === `index${extension}` ||
+      entry.name.endsWith(`.test${extension}`) ||
+      entry.name.endsWith(`.logic${extension}`)
+    ) {
+      continue;
+    }
     if (entry.isDirectory()) {
       const subfiles = await readdir(`${commandsDir}/${entry.name}`);
       for (const f of subfiles.filter((f) => f.endsWith(extension))) {
@@ -23,10 +28,9 @@ export async function findCommandFiles(commandsDir: string, extension: string): 
 export async function loadCommands(client: BotClient) {
   const commandsDir = import.meta.dirname;
   const files = await findCommandFiles(commandsDir, ".js");
-
   for (const file of files) {
     const { command } = await import(file);
-    if (!("data" in command && "execute" in command)) {
+    if (!command || !("data" in command) || !("execute" in command)) {
       console.warn(`[warn] no data or execute foundin ${file}`);
       continue;
     }
