@@ -39,7 +39,7 @@ export const command: Command = {
   },
 
   execute: async (interaction) => {
-    const guildId = interaction.guildId!;
+    const guildId = interaction.guildId;
     const leaderboardname = interaction.options.getString("name", true);
 
     if (!(await leaderboardExists(guildId, leaderboardname))) {

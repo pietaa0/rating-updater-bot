@@ -24,6 +24,7 @@ export async function getPlayerByName(name: string) {
   if (data.length === 0) {
     return null;
   }
+
   return data;
 }
 

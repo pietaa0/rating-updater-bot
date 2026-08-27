@@ -7,6 +7,10 @@ export async function execute(interaction: Interaction) {
   const client = interaction.client as BotClient;
 
   if (interaction.isAutocomplete()) {
+    if (!interaction.inGuild()) {
+      await interaction.respond([]);
+      return;
+    }
     const command = client.commands.get(interaction.commandName);
     if (command?.autocomplete) await command.autocomplete(interaction);
     return;

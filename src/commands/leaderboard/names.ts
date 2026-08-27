@@ -7,7 +7,7 @@ export const command: Command = {
     .setName("showallleaderboards")
     .setDescription("show the names of all leaderboards"),
   execute: async (interaction) => {
-    const guildId = interaction.guildId!;
+    const guildId = interaction.guildId;
     const leaderboards = await getAllLeaderboards(guildId);
 
     if (leaderboards.length === 0) {

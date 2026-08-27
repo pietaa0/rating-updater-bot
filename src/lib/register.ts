@@ -8,7 +8,7 @@ enum CommandScope {
   Guild = "guild",
   Global = "global",
 }
-function getCommandScope(scope: string) {
+function getCommandScope(scope: string | undefined) {
   if (scope === "guild") {
     return CommandScope.Guild;
   }
@@ -21,9 +21,9 @@ function getCommandScope(scope: string) {
 const token = process.env.DISCORD_TOKEN;
 const clientId = process.env.DISCORD_CLIENT_ID;
 const guildId = process.env.DISCORD_GUILD_ID;
-const scope = getCommandScope(process.env.COMMAND_SCOPE!);
+const scope = getCommandScope(process.env.COMMAND_SCOPE);
 
-if (!token || !clientId || (!guildId && scope === CommandScope.Guild)) {
+if (!token || !clientId || !guildId) {
   throw new Error("Missing DISCORD_TOKEN, DISCORD_CLIENT_ID, or DISCORD_GUILD_ID in .env");
 }
 
@@ -39,7 +39,7 @@ for (const file of files) {
 const rest = new REST().setToken(token);
 let data: unknown;
 if (scope === CommandScope.Guild) {
-  data = await rest.put(Routes.applicationGuildCommands(clientId, guildId!), { body: commands });
+  data = await rest.put(Routes.applicationGuildCommands(clientId, guildId), { body: commands });
   console.log(`Loaded ${(data as unknown[]).length} commands to guild succesfully!`);
 }
 if (scope === CommandScope.Global) {

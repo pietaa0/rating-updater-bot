@@ -7,8 +7,12 @@ import { striveCharacters } from "../game-data/characters.js";
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 await client.login(process.env.DISCORD_TOKEN);
 
+if (client.application === null) {
+  throw new Error("client.application is null");
+}
+
 const assetDir = path.join(import.meta.dirname, "../../assets/emoji");
-const existing = await client.application!.emojis.fetch();
+const existing = await client.application.emojis.fetch();
 const mapping: Record<string, { id: string; name: string }> = {};
 
 for (const char of striveCharacters) {
@@ -29,7 +33,7 @@ for (const char of striveCharacters) {
   }
 
   const buffer = await readFile(filePath);
-  const created = await client.application!.emojis.create({ attachment: buffer, name: char.id });
+  const created = await client.application.emojis.create({ attachment: buffer, name: char.id });
   mapping[char.id] = { id: created.id, name: created.name };
   console.log(`uploaded ${char.name}`);
 }

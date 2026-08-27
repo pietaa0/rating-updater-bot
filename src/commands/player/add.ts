@@ -69,7 +69,7 @@ export const command: Command = {
     }
   },
   execute: async (interaction) => {
-    const guildId = interaction.guildId!;
+    const guildId = interaction.guildId;
     const query = interaction.options.getString("name_or_id", true);
     const leaderboardName = interaction.options.getString("leaderboard", true);
     const character = interaction.options.getString("character", true);

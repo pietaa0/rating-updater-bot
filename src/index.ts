@@ -6,4 +6,4 @@ import { loadEvents } from "./events/index.js";
 await loadCommands(client);
 await loadEvents(client);
 
-client.login(process.env.DISCORD_TOKEN);
+await client.login(process.env.DISCORD_TOKEN);

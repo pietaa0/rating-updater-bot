@@ -11,7 +11,7 @@ export const command: Command = {
     ),
   execute: async (interaction) => {
     const name = interaction.options.getString("name", true);
-    const guildId = interaction.guildId!;
+    const guildId = interaction.guildId;
 
     if (name.length > 100) {
       await interaction.reply({
