@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    env:
+      # queries.test.ts imports src/db/index.ts, which throws at import time
+      # if this isn't set, before setTestDb ever swaps in the in-memory db.
+      DB_FILE_NAME: file:ci-dummy.db
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run ci
+
+      - name: Type-check / build
+        run: npm run build
+
+      - name: Test
+        run: npm test

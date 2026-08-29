@@ -11,6 +11,7 @@
     "start": "node dist/index.js",
     "register": "tsx src/lib/register.ts",
     "lint": "biome check .",
+    "ci": "biome ci .",
     "format": "biome check . --write",
     "db:migrate": "drizzle-kit migrate",
     "db:seed": "tsx src/lib/seed.ts",
