@@ -15,6 +15,7 @@ import {
   getTrackedCharacters,
   leaderboardExists,
   removeLeaderboardEntry,
+  updatePlayerRating,
   upsertPlayer,
 } from "./queries.ts";
 import { characters } from "./schema.js";
@@ -265,6 +266,16 @@ describe("queries.ts", async () => {
 
       expect(stale).toHaveLength(1);
       expect(stale[0]).toBe(playerId);
+    });
+    it("updatePlayerRating updates both rating and updatedAt", async () => {
+      vi.advanceTimersByTime(thresholdMs + 1);
+      const stale = await getStalePlayers(guildId, leaderboardName, thresholdMs);
+      expect(stale).toHaveLength(1);
+      await updatePlayerRating(guildId, leaderboardName, playerId, characterId, highRating);
+      const player = await getLeaderboardData(guildId, leaderboardName);
+      expect(player).toHaveLength(1);
+      expect(player[0].rating).toBe(highRating);
+      expect(await getStalePlayers(guildId, leaderboardName, thresholdMs)).toHaveLength(0);
     });
   });
 });
