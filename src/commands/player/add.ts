@@ -116,6 +116,10 @@ export const command: Command = {
           await interaction.editReply(`${direct.name} doesn't have any ratings for ${character}`);
           return;
         }
+
+        if ((await getRating(guildId, leaderboardName, query, character)).length !== 0) {
+          await interaction.editReply(`${direct.name} already on ${leaderboardName}`);
+        }
         await upsertPlayer(direct.id, direct.name);
         await addPlayerRating(
           guildId,
