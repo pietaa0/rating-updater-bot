@@ -19,7 +19,11 @@ export async function leaderboardExists(guildId: string, name: string) {
   return rows.length > 0;
 }
 export async function getAllLeaderboards(guildId: string) {
-  const rows = await db.select().from(leaderboards).where(eq(leaderboards.guildId, guildId));
+  const rows = await db
+    .select()
+    .from(leaderboards)
+    .where(eq(leaderboards.guildId, guildId))
+    .orderBy(leaderboards.updatedAt);
   return rows;
 }
 export async function upsertPlayer(id: string, name: string) {
