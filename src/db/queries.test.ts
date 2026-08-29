@@ -1,9 +1,5 @@
-import path from "node:path";
-import { drizzle } from "drizzle-orm/libsql";
-import { migrate } from "drizzle-orm/libsql/migrator";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { striveCharacters } from "../game-data/characters.js";
-import { db, setTestDb } from "./index.js";
+import { createInMemoryDb } from "../test/mock-db.ts";
 import {
   addPlayerRating,
   createLeaderboard,
@@ -18,18 +14,6 @@ import {
   updatePlayerRating,
   upsertPlayer,
 } from "./queries.ts";
-import { characters } from "./schema.js";
-
-async function createInMemoryDb() {
-  const testDb = drizzle(":memory:");
-
-  await migrate(testDb, {
-    migrationsFolder: path.join(import.meta.dirname, "../../drizzle"),
-  });
-
-  setTestDb(testDb);
-  return testDb;
-}
 
 describe("queries.ts", async () => {
   const guildId = "guild-123";
@@ -48,8 +32,6 @@ describe("queries.ts", async () => {
 
   beforeEach(async () => {
     await createInMemoryDb();
-    // static seed data
-    await db.insert(characters).values(striveCharacters);
   });
   describe("basic leaderboard functions", async () => {
     it("createLeaderboard + leaderboardExists", async () => {
