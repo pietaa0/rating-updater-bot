@@ -20,10 +20,15 @@ export async function syncPlayerRatings(
 
   await upsertPlayer(player.id, player.name);
 
+  const updates = [];
+
   for (const rating of player.ratings) {
     if (!trackedCharacters.includes(rating.char_short)) continue;
-    await updatePlayerRating(guildId, leaderboardName, player.id, rating.char_short, rating.rating);
+    updates.push(
+      updatePlayerRating(guildId, leaderboardName, player.id, rating.char_short, rating.rating),
+    );
   }
+  await Promise.all(updates);
 }
 
 const BATCH_SIZE = 5;
