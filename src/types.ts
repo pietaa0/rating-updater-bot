@@ -7,7 +7,7 @@ import type {
   SlashCommandSubcommandBuilder,
 } from "discord.js";
 
-type GuildInputCommandInteraction<Cached extends CacheType = CacheType> = Omit<
+export type GuildInputCommandInteraction<Cached extends CacheType = CacheType> = Omit<
   ChatInputCommandInteraction<Cached>,
   "guildId"
 > & {
