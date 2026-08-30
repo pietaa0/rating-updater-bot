@@ -32,6 +32,7 @@ export const command: Command = {
     if (leaderboards.length > 9) {
       await interaction.reply({
         content: "10 other leaderboards already exist, please delete one before creating another",
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
