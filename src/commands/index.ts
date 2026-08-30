@@ -15,7 +15,12 @@ export async function findCommandFiles(commandsDir: string, extension: string): 
     }
     if (entry.isDirectory()) {
       const subfiles = await readdir(`${commandsDir}/${entry.name}`);
-      for (const f of subfiles.filter((f) => f.endsWith(extension))) {
+      for (const f of subfiles.filter(
+        (f) =>
+          f.endsWith(extension) &&
+          !f.endsWith(`.test${extension}`) &&
+          !f.endsWith(`.logic${extension}`),
+      )) {
         files.push(`${commandsDir}/${entry.name}/${f}`);
       }
     } else if (entry.name.endsWith(extension)) {
