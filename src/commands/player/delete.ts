@@ -44,7 +44,6 @@ export const command: Command = {
   execute: async (interaction) => {
     const guildId = interaction.guildId;
     const leaderboardName = interaction.options.getString("leaderboard", true);
-
     const validLeaderboard = await leaderboardExists(guildId, leaderboardName);
     if (!validLeaderboard) {
       await interaction.reply({
@@ -53,11 +52,12 @@ export const command: Command = {
       });
       return;
     }
-
     const leaderboard = await getLeaderboardData(guildId, leaderboardName);
-
     if (leaderboard.length === 0) {
-      await interaction.reply(`there are no players on ${leaderboardName}`);
+      await interaction.reply({
+        content: `there are no players on ${leaderboardName}`,
+        flags: MessageFlags.Ephemeral,
+      });
       return;
     }
 
@@ -92,6 +92,9 @@ export const command: Command = {
 
       if (!playerId || !characterId) {
         console.error(`removeplayer had playerId ${playerId} and characterId ${characterId}`);
+        await confirmation.editReply({
+          components: [new TextDisplayBuilder().setContent(`button customId was malformed`)],
+        });
         return;
       }
 
