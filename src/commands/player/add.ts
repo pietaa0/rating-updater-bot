@@ -117,8 +117,9 @@ export const command: Command = {
           return;
         }
 
-        if ((await getRating(guildId, leaderboardName, query, character)).length !== 0) {
-          await interaction.editReply(`${direct.name} already on ${leaderboardName}`);
+        if ((await getRating(guildId, leaderboardName, query, rating.char_short)).length !== 0) {
+          await interaction.editReply(`player already on ${leaderboardName}`);
+          return;
         }
         await upsertPlayer(direct.id, direct.name);
         await addPlayerRating(
@@ -187,7 +188,7 @@ export const command: Command = {
         await confirmation.editReply({
           components: [
             new TextDisplayBuilder().setContent(
-              `${player.name}'s ${player.char_long} already on leaderboard`,
+              `player's ${player.char_long} already on leaderboard`,
             ),
           ],
         });
@@ -216,7 +217,7 @@ export const command: Command = {
         return;
       }
       console.error("error:", err);
-      interaction.editReply({
+      await interaction.editReply({
         components: [new TextDisplayBuilder().setContent(`something went wrong`)],
       });
       return;
