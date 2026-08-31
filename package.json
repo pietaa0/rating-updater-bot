@@ -4,6 +4,9 @@
   "description": "new and improved version",
   "private": true,
   "author": "pietaa",
+  "engines": {
+    "node": ">=24"
+  },
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
@@ -23,14 +26,14 @@
     "@libsql/client": "^0.17.4",
     "discord.js": "^14.27.0",
     "dotenv": "^17.4.2",
-    "drizzle-orm": "^1.0.0-rc.4",
+    "drizzle-orm": "1.0.0-rc.4",
     "fuzzball": "^2.2.6",
     "zod": "^4.4.3"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.9",
     "@types/node": "^26.2.0",
-    "drizzle-kit": "^1.0.0-rc.4",
+    "drizzle-kit": "1.0.0-rc.4",
     "tsx": "^4.23.12",
     "typescript": "^7.0.2",
     "vitest": "^4.1.11"
