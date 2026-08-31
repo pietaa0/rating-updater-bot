@@ -81,12 +81,14 @@ export const command: Command = {
         time: 60_000,
       });
 
+      await confirmation?.deferUpdate();
       if (!confirmation?.isButton()) {
+        confirmation?.editReply({
+          components: [new TextDisplayBuilder().setContent(`something went wrong`)],
+        });
         console.error("removeplayer's confirmation wasn't button");
         return;
       }
-
-      await confirmation.deferUpdate();
 
       const [playerId, characterId] = confirmation.customId.split(":");
 

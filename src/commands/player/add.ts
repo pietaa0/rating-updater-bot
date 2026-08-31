@@ -170,17 +170,24 @@ export const command: Command = {
         time: 300_000,
       });
 
+      await confirmation?.deferUpdate();
+
       if (!confirmation?.isButton()) {
         console.error("addplayer's confirmation wasn't button");
+        await confirmation?.editReply({
+          components: [new TextDisplayBuilder().setContent(`something went wrong`)],
+        });
         return;
       }
 
-      await confirmation.deferUpdate();
       const id = confirmation.customId;
       const player = data.find((d) => d.id === id);
 
       if (player === undefined) {
         console.error("addplayers' id disappeared");
+        await confirmation?.editReply({
+          components: [new TextDisplayBuilder().setContent(`something went wrong`)],
+        });
         return;
       }
 
