@@ -40,8 +40,8 @@ describe("puddle.farm client", () => {
       const result404 = await getPlayerById("123");
       const result400 = await getPlayerById("123");
 
-      expect(result404).toBeNull;
-      expect(result400).toBeNull;
+      expect(result404).toBeNull();
+      expect(result400).toBeNull();
     });
     it("returns parsed player data on 200", async () => {
       mockFetch.mockResolvedValue({
@@ -53,7 +53,7 @@ describe("puddle.farm client", () => {
       const result = await getPlayerById("123");
 
       expect(result).toEqual(playerById);
-      expect(mockFetch).toHaveBeenCalledOnce;
+      expect(mockFetch).toHaveBeenCalledOnce();
       expect(mockFetch).toHaveBeenCalledWith(
         "https://puddle.farm/api/player/123",
         expect.anything(),
@@ -93,8 +93,8 @@ describe("puddle.farm client", () => {
 
       const result = await getPlayerById("123");
 
-      expect(result).toBeNull;
-      expect(mockFetch).toHaveBeenCalledOnce;
+      expect(result).toBeNull();
+      expect(mockFetch).toHaveBeenCalledOnce();
     });
     it("retries on network error, then succeeds", async () => {
       mockFetch.mockRejectedValueOnce(new Error("network down")).mockResolvedValueOnce({
@@ -130,8 +130,8 @@ describe("puddle.farm client", () => {
 
       const result = await getPlayerByName("non-existant player");
 
-      expect(result).toBeNull;
-      expect(mockFetch).toHaveBeenCalledOnce;
+      expect(result).toBeNull();
+      expect(mockFetch).toHaveBeenCalledOnce();
     });
     it("returns search results on 200", async () => {
       mockFetch.mockResolvedValue({
@@ -143,7 +143,7 @@ describe("puddle.farm client", () => {
       const result = await getPlayerByName("player-1");
 
       expect(result).toEqual([playerByName]);
-      expect(mockFetch).toHaveBeenCalledOnce;
+      expect(mockFetch).toHaveBeenCalledOnce();
     });
   });
 });

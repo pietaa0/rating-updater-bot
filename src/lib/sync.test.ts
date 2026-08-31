@@ -34,9 +34,9 @@ describe("syncPlayerRatings", () => {
 
     await syncPlayerRatings(guildId, leaderboardName, playerId);
 
-    expect(getPlayerById).not.toHaveBeenCalled;
-    expect(upsertPlayer).not.toHaveBeenCalled;
-    expect(updatePlayerRating).not.toHaveBeenCalled;
+    expect(getPlayerById).not.toHaveBeenCalled();
+    expect(upsertPlayer).not.toHaveBeenCalled();
+    expect(updatePlayerRating).not.toHaveBeenCalled();
   });
   it("throws when the player can't be found", async () => {
     getTrackedCharacters.mockResolvedValue(["SO"]);
@@ -44,7 +44,7 @@ describe("syncPlayerRatings", () => {
     await expect(syncPlayerRatings(guildId, leaderboardName, playerId)).rejects.toThrow(
       `player ${playerId} not found during sync`,
     );
-    expect(getPlayerById).toHaveBeenCalled;
+    expect(getPlayerById).toHaveBeenCalled();
   });
   it("only updates ratings for tracked characters", async () => {
     getTrackedCharacters.mockResolvedValue(["SO"]);
