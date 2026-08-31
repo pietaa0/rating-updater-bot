@@ -36,7 +36,7 @@ export async function loadCommands(client: BotClient) {
   for (const file of files) {
     const { command } = await import(file);
     if (!command || !("data" in command) || !("execute" in command)) {
-      console.warn(`[warn] no data or execute foundin ${file}`);
+      console.warn(`[warn] no data or execute found in ${file}`);
       continue;
     }
     client.commands.set(command.data.name, command);
