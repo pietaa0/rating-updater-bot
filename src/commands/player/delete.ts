@@ -84,7 +84,7 @@ export const command: Command = {
 
       await confirmation?.deferUpdate();
       if (!confirmation?.isButton()) {
-        confirmation?.editReply({
+        await confirmation?.editReply({
           components: [new TextDisplayBuilder().setContent(`something went wrong`)],
         });
         console.error("removeplayer's confirmation wasn't button");
@@ -103,7 +103,7 @@ export const command: Command = {
 
       await removeLeaderboardEntry(guildId, leaderboardName, playerId, characterId);
 
-      confirmation.editReply({
+      await confirmation.editReply({
         components: [
           new TextDisplayBuilder().setContent(`successfully removed player from leaderboard`),
         ],
