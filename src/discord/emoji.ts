@@ -10,7 +10,11 @@ export async function emoji(characterId: string) {
     } else {
       return "";
     }
-  } catch (_) {
+  } catch (err) {
+    if (err instanceof Error && "code" in err && err.code === "ERR_MODULE_NOT_FOUND") {
+      return "";
+    }
+    console.error(err);
     return "";
   }
 }
