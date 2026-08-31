@@ -1,4 +1,4 @@
-import { MessageFlags, SlashCommandBuilder } from "discord.js";
+import { escapeMarkdown, MessageFlags, SlashCommandBuilder } from "discord.js";
 import { createLeaderboard, getAllLeaderboards, leaderboardExists } from "../../db/queries.js";
 import type { Command } from "../../types.js";
 
@@ -23,7 +23,7 @@ export const command: Command = {
 
     if (await leaderboardExists(guildId, name)) {
       await interaction.reply({
-        content: `"${name}" already exists`,
+        content: `"${escapeMarkdown(name)}" already exists`,
         flags: MessageFlags.Ephemeral,
       });
       return;
@@ -37,6 +37,6 @@ export const command: Command = {
       return;
     }
     await createLeaderboard(guildId, name);
-    await interaction.reply(`created leaderboard "${name}"`);
+    await interaction.reply(`created leaderboard "${escapeMarkdown(name)}"`);
   },
 };

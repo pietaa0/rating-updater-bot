@@ -1,4 +1,4 @@
-import { MessageFlags, SlashCommandBuilder } from "discord.js";
+import { escapeMarkdown, MessageFlags, SlashCommandBuilder } from "discord.js";
 import { deleteLeaderboard, getAllLeaderboards, leaderboardExists } from "../../db/queries.js";
 import type { Command } from "../../types.js";
 import { getFuzzyAutocomplete } from "../shared.logic.js";
@@ -35,12 +35,12 @@ export const command: Command = {
 
     if (!(await leaderboardExists(guildId, name))) {
       await interaction.reply({
-        content: `"${name}" doesn't exist`,
+        content: `"${escapeMarkdown(name)}" doesn't exist`,
         flags: MessageFlags.Ephemeral,
       });
       return;
     }
     await deleteLeaderboard(guildId, name);
-    await interaction.reply(`leaderboard "${name}" has been deleted`);
+    await interaction.reply(`leaderboard "${escapeMarkdown(name)}" has been deleted`);
   },
 };

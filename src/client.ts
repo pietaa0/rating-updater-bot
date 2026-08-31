@@ -7,4 +7,5 @@ export class BotClient extends Client {
 
 export const client = new BotClient({
   intents: [GatewayIntentBits.Guilds],
+  allowedMentions: { parse: [] },
 });

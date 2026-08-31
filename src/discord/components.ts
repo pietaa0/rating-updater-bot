@@ -1,4 +1,4 @@
-import { ButtonStyle, ContainerBuilder, SeparatorSpacingSize } from "discord.js";
+import { ButtonStyle, ContainerBuilder, escapeMarkdown, SeparatorSpacingSize } from "discord.js";
 import type { LeaderboardRow } from "../db/queries.js";
 import { striveCharacters } from "../game-data/characters.js";
 import type { puddleSearchResult } from "../puddlefarm/client.js";
@@ -10,7 +10,7 @@ export async function leaderboardContainer(leaderboard: LeaderboardRow[]) {
     characterName: striveCharacters.find((c) => c.id === r.characterId)?.name ?? r.characterId,
   }));
   return await buildPlayerContainer(
-    display[0]?.leaderboardName ?? "unkown title",
+    display[0]?.leaderboardName ?? "unknown title",
     display,
     (d) => ({ name: d.playerName, characterName: d.characterName, rating: d.rating }),
   );
@@ -57,12 +57,12 @@ export async function buildPlayerContainer<T>(
 ) {
   const container = new ContainerBuilder()
     .setAccentColor(0xff0000)
-    .addTextDisplayComponents((t) => t.setContent(`### ${title}`))
+    .addTextDisplayComponents((t) => t.setContent(`### ${escapeMarkdown(title)}`))
     .addSeparatorComponents((s) => s.setSpacing(SeparatorSpacingSize.Small));
 
   for (const [i, item] of items.entries()) {
     const row = toRow(item);
-    const player = await playerRow(row.name, row.characterName, row.rating);
+    const player = await playerRow(escapeMarkdown(row.name), row.characterName, row.rating);
     const line = `${i + 1}. ${player}`;
 
     if (toButton) {

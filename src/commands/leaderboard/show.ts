@@ -1,4 +1,4 @@
-import { MessageFlags, SlashCommandBuilder, TextDisplayBuilder } from "discord.js";
+import { escapeMarkdown, MessageFlags, SlashCommandBuilder, TextDisplayBuilder } from "discord.js";
 import {
   getAllLeaderboards,
   getLeaderboardData,
@@ -43,7 +43,7 @@ export const command: Command = {
     const leaderboardname = interaction.options.getString("name", true);
 
     if (!(await leaderboardExists(guildId, leaderboardname))) {
-      await interaction.reply(`${leaderboardname} doesn't exist`);
+      await interaction.reply(`${escapeMarkdown(leaderboardname)} doesn't exist`);
       return;
     }
 
@@ -67,7 +67,7 @@ export const command: Command = {
     const rows = await getLeaderboardData(guildId, leaderboardname);
 
     if (rows.length === 0) {
-      await interaction.editReply(`${leaderboardname} is empty`);
+      await interaction.editReply(`${escapeMarkdown(leaderboardname)} is empty`);
       return;
     }
 

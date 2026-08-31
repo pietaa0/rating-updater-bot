@@ -1,6 +1,7 @@
 import {
   DiscordjsError,
   DiscordjsErrorCodes,
+  escapeMarkdown,
   type MessageComponentInteraction,
   MessageFlags,
   SlashCommandBuilder,
@@ -113,12 +114,14 @@ export const command: Command = {
         const rating = direct.ratings.find((r) => r.character === character);
 
         if (!rating) {
-          await interaction.editReply(`${direct.name} doesn't have any ratings for ${character}`);
+          await interaction.editReply(
+            `${escapeMarkdown(direct.name)} doesn't have any ratings for ${character}`,
+          );
           return;
         }
 
         if ((await getRating(guildId, leaderboardName, query, rating.char_short)).length !== 0) {
-          await interaction.editReply(`player already on ${leaderboardName}`);
+          await interaction.editReply(`player already on ${escapeMarkdown(leaderboardName)}`);
           return;
         }
         await upsertPlayer(direct.id, direct.name);
@@ -129,13 +132,15 @@ export const command: Command = {
           rating.char_short,
           rating.rating,
         );
-        await interaction.editReply(`added ${direct.name} to ${leaderboardName}`);
+        await interaction.editReply(
+          `added ${escapeMarkdown(direct.name)} to ${escapeMarkdown(leaderboardName)}`,
+        );
         return;
       }
       const search = await getPlayerByName(query);
 
       if (!search || search.length === 0) {
-        await interaction.editReply(`couldn't find any player "${query}"`);
+        await interaction.editReply(`couldn't find any player "${escapeMarkdown(query)}"`);
         return;
       }
 
@@ -147,7 +152,9 @@ export const command: Command = {
           flags: MessageFlags.IsComponentsV2,
         });
       } else {
-        await interaction.editReply(`couldn't find any player "${query}" who plays ${character}`);
+        await interaction.editReply(
+          `couldn't find any player "${escapeMarkdown(query)}" who plays ${character}`,
+        );
         return;
       }
     } catch (err) {
@@ -207,7 +214,7 @@ export const command: Command = {
       await confirmation.editReply({
         components: [
           new TextDisplayBuilder().setContent(
-            `successfully added ${player.name}'s ${player.char_long} to ${leaderboardName}`,
+            `successfully added ${escapeMarkdown(player.name)}'s ${player.char_long} to ${escapeMarkdown(leaderboardName)}`,
           ),
         ],
       });

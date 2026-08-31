@@ -1,6 +1,7 @@
 import {
   DiscordjsError,
   DiscordjsErrorCodes,
+  escapeMarkdown,
   type MessageComponentInteraction,
   MessageFlags,
   SlashCommandBuilder,
@@ -55,7 +56,7 @@ export const command: Command = {
     const leaderboard = await getLeaderboardData(guildId, leaderboardName);
     if (leaderboard.length === 0) {
       await interaction.reply({
-        content: `there are no players on ${leaderboardName}`,
+        content: `there are no players on ${escapeMarkdown(leaderboardName)}`,
         flags: MessageFlags.Ephemeral,
       });
       return;
@@ -78,7 +79,7 @@ export const command: Command = {
     try {
       const confirmation = await response.resource?.message?.awaitMessageComponent({
         filter: collectorFilter,
-        time: 60_000,
+        time: 300_000,
       });
 
       await confirmation?.deferUpdate();

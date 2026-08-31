@@ -1,4 +1,4 @@
-import { MessageFlags, SlashCommandBuilder } from "discord.js";
+import { escapeMarkdown, MessageFlags, SlashCommandBuilder } from "discord.js";
 import { getAllLeaderboards } from "../../db/queries.js";
 import type { Command } from "../../types.js";
 
@@ -19,7 +19,7 @@ export const command: Command = {
     }
     let content = "the following leaderboard(s) exist:\n";
     for (const row of leaderboards) {
-      content += `${row.name}\n`;
+      content += `${escapeMarkdown(row.name)}\n`;
     }
     await interaction.reply(content);
   },
