@@ -57,7 +57,9 @@ export function buildPlayerContainer<T>(
 ) {
   const container = new ContainerBuilder()
     .setAccentColor(0xff0000)
-    .addTextDisplayComponents((t) => t.setContent(`### ${escapeMarkdown(title)}`))
+    .addTextDisplayComponents((t) =>
+      t.setContent(`### ${escapeMarkdown(title, { heading: true })}`),
+    )
     .addSeparatorComponents((s) => s.setSpacing(SeparatorSpacingSize.Small));
 
   for (const [i, item] of items.entries()) {
