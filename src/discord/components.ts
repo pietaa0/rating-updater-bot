@@ -9,42 +9,22 @@ export async function leaderboardContainer(leaderboard: LeaderboardRow[]) {
     ...r,
     characterName: striveCharacters.find((c) => c.id === r.characterId)?.name ?? r.characterId,
   }));
-
-  const container = new ContainerBuilder()
-    .setAccentColor(0xff0000)
-    .addTextDisplayComponents((textdisplay) =>
-      textdisplay.setContent(`### ${display[0]?.leaderboardName ?? "unknown title"}`),
-    )
-    .addSeparatorComponents((separator) => separator.setSpacing(SeparatorSpacingSize.Small));
-
-  for (const [i, row] of display.entries()) {
-    const player = await playerRow(row.playerName, row.characterName, row.rating);
-    container.addTextDisplayComponents((textdisplay) =>
-      textdisplay.setContent(`${i + 1}. ${player}`),
-    );
-  }
-
-  return container;
+  return await buildPlayerContainer(
+    display[0]?.leaderboardName ?? "unkown title",
+    display,
+    (d) => ({ name: d.playerName, characterName: d.characterName, rating: d.rating }),
+  );
 }
 
 export async function addPlayerContainer(search: puddleSearchResult) {
   const players = search.slice(0, 5);
 
-  const container = new ContainerBuilder()
-    .setAccentColor(0xff0000)
-    .addTextDisplayComponents((textdisplay) => textdisplay.setContent("### add a player"));
-
-  for (const [i, row] of players.entries()) {
-    const player = await playerRow(row.name, row.char_long, row.rating);
-    container.addSectionComponents((section) =>
-      section
-        .addTextDisplayComponents((textdisplay) => textdisplay.setContent(`${i + 1}. ${player}`))
-        .setButtonAccessory((button) =>
-          button.setCustomId(`${row.id}`).setLabel("add").setStyle(ButtonStyle.Primary),
-        ),
-    );
-  }
-  return container;
+  return await buildPlayerContainer(
+    "add a player",
+    players,
+    (p) => ({ name: p.name, characterName: p.char_long, rating: p.rating }),
+    (p) => ({ label: "add", customId: p.id }),
+  );
 }
 
 export async function removePlayerContainer(leaderboard: LeaderboardRow[]) {
@@ -52,31 +32,58 @@ export async function removePlayerContainer(leaderboard: LeaderboardRow[]) {
     ...r,
     characterName: striveCharacters.find((c) => c.id === r.characterId)?.name ?? r.characterId,
   }));
+  return await buildPlayerContainer(
+    "remove a player",
+    display,
+    (d) => ({ name: d.playerName, characterName: d.characterName, rating: d.rating }),
+    (d) => ({ label: "remove", customId: `${d.playerId}:${d.characterId}` }),
+  );
+}
+interface ContainerRow {
+  name: string;
+  characterName: string;
+  rating: number;
+}
+interface ButtonConf {
+  label: string;
+  customId: string;
+}
 
+export async function buildPlayerContainer<T>(
+  title: string,
+  items: T[],
+  toRow: (item: T) => ContainerRow,
+  toButton?: (item: T) => ButtonConf,
+) {
   const container = new ContainerBuilder()
     .setAccentColor(0xff0000)
-    .addTextDisplayComponents((textdisplay) => textdisplay.setContent("### remove a player"))
-    .addSeparatorComponents((separator) => separator.setSpacing(SeparatorSpacingSize.Small));
+    .addTextDisplayComponents((t) => t.setContent(`### ${title}`))
+    .addSeparatorComponents((s) => s.setSpacing(SeparatorSpacingSize.Small));
 
-  for (const [i, row] of display.entries()) {
-    const player = await playerRow(row.playerName, row.characterName, row.rating);
-    container.addSectionComponents((section) =>
-      section
-        .addTextDisplayComponents((textdisplay) => textdisplay.setContent(`${i + 1}. ${player}`))
-        .setButtonAccessory((button) =>
-          button
-            .setCustomId(`${row.playerId}:${row.characterId}`)
-            .setLabel("remove")
-            .setStyle(ButtonStyle.Primary),
-        ),
-    );
+  for (const [i, item] of items.entries()) {
+    const row = toRow(item);
+    const player = await playerRow(row.name, row.characterName, row.rating);
+    const line = `${i + 1}. ${player}`;
+
+    if (toButton) {
+      const button = toButton(item);
+      container.addSectionComponents((s) =>
+        s
+          .addTextDisplayComponents((t) => t.setContent(line))
+          .setButtonAccessory((b) =>
+            b.setLabel(button.label).setCustomId(button.customId).setStyle(ButtonStyle.Primary),
+          ),
+      );
+    } else {
+      container.addTextDisplayComponents((t) => t.setContent(line));
+    }
   }
-
   return container;
 }
 
 function numToRating(rating: number) {
   if (rating < 10000000) {
+    // ratings above 10,000,000 correspond to DR
     return `${rating} RP`;
   } else {
     return `${rating - 10000000} DR`;
