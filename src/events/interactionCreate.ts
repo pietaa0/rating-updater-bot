@@ -27,8 +27,12 @@ export async function execute(interaction: Interaction) {
     try {
       await command.execute(interaction);
     } catch (err) {
-      console.error(err);
-      const reply = { content: "?", flags: MessageFlags.Ephemeral as const };
+      console.error(
+        `command failed: /${interaction.commandName}`,
+        { userId: interaction.user.id, guildId: interaction.guildId },
+        err,
+      );
+      const reply = { content: `Something went wrong`, flags: MessageFlags.Ephemeral as const };
       if (interaction.replied || interaction.deferred) {
         await interaction.followUp(reply);
       } else {
