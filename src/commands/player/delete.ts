@@ -64,7 +64,7 @@ export const command: Command = {
 
     const response = await interaction.deferReply({ withResponse: true });
 
-    const container = await removePlayerContainer(leaderboard);
+    const container = removePlayerContainer(leaderboard);
 
     await interaction.editReply({ components: [container], flags: MessageFlags.IsComponentsV2 });
 

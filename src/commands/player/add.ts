@@ -146,7 +146,7 @@ export const command: Command = {
 
       data = search.filter((r) => r.char_long === character);
       if (data.length > 0) {
-        const container = await addPlayerContainer(data);
+        const container = addPlayerContainer(data);
         await interaction.editReply({
           components: [container],
           flags: MessageFlags.IsComponentsV2,

@@ -71,7 +71,7 @@ export const command: Command = {
       return;
     }
 
-    const leaderboard = await leaderboardContainer(rows);
+    const leaderboard = leaderboardContainer(rows);
 
     await interaction.editReply({ components: [leaderboard], flags: MessageFlags.IsComponentsV2 });
   },

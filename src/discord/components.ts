@@ -4,22 +4,22 @@ import { striveCharacters } from "../game-data/characters.js";
 import type { puddleSearchResult } from "../puddlefarm/client.js";
 import { emoji } from "./emoji.js";
 
-export async function leaderboardContainer(leaderboard: LeaderboardRow[]) {
+export function leaderboardContainer(leaderboard: LeaderboardRow[]) {
   const display = leaderboard.map((r) => ({
     ...r,
     characterName: striveCharacters.find((c) => c.id === r.characterId)?.name ?? r.characterId,
   }));
-  return await buildPlayerContainer(
-    display[0]?.leaderboardName ?? "unknown title",
-    display,
-    (d) => ({ name: d.playerName, characterName: d.characterName, rating: d.rating }),
-  );
+  return buildPlayerContainer(display[0]?.leaderboardName ?? "unknown title", display, (d) => ({
+    name: d.playerName,
+    characterName: d.characterName,
+    rating: d.rating,
+  }));
 }
 
-export async function addPlayerContainer(search: puddleSearchResult) {
+export function addPlayerContainer(search: puddleSearchResult) {
   const players = search.slice(0, 5);
 
-  return await buildPlayerContainer(
+  return buildPlayerContainer(
     "add a player",
     players,
     (p) => ({ name: p.name, characterName: p.char_long, rating: p.rating }),
@@ -27,12 +27,12 @@ export async function addPlayerContainer(search: puddleSearchResult) {
   );
 }
 
-export async function removePlayerContainer(leaderboard: LeaderboardRow[]) {
+export function removePlayerContainer(leaderboard: LeaderboardRow[]) {
   const display = leaderboard.map((r) => ({
     ...r,
     characterName: striveCharacters.find((c) => c.id === r.characterId)?.name ?? r.characterId,
   }));
-  return await buildPlayerContainer(
+  return buildPlayerContainer(
     "remove a player",
     display,
     (d) => ({ name: d.playerName, characterName: d.characterName, rating: d.rating }),
@@ -49,7 +49,7 @@ interface ButtonConf {
   customId: string;
 }
 
-export async function buildPlayerContainer<T>(
+export function buildPlayerContainer<T>(
   title: string,
   items: T[],
   toRow: (item: T) => ContainerRow,
@@ -62,7 +62,7 @@ export async function buildPlayerContainer<T>(
 
   for (const [i, item] of items.entries()) {
     const row = toRow(item);
-    const player = await playerRow(escapeMarkdown(row.name), row.characterName, row.rating);
+    const player = playerRow(escapeMarkdown(row.name), row.characterName, row.rating);
     const line = `${i + 1}. ${player}`;
 
     if (toButton) {
@@ -90,8 +90,8 @@ function numToRating(rating: number) {
   }
 }
 
-async function playerRow(name: string, character: string, rating: number) {
+function playerRow(name: string, character: string, rating: number) {
   const characterId = striveCharacters.find((c) => c.name === character)?.id;
-  const characterEmoji = characterId ? await emoji(characterId) : "";
+  const characterEmoji = characterId ? emoji(characterId) : "";
   return `**${name}**: **${numToRating(rating)}** on ${characterEmoji}**${character}**`;
 }
